@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Symptoms Checker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='awesomplete-gh-pages/awesomplete.css') }}">
+    <script src="{{ url_for('static', filename='awesomplete-gh-pages/awesomplete.js') }}"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+
+        textarea {
+            width: 80%;
+            padding: 10px;
+            margin: 10px auto;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        h2 {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #ddd;
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #333;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Health Symptoms Checker</h1>
+
+    <label for="symptomInput">Enter your condition:</label>
+    <textarea id="symptomInput" rows="4" cols="50"></textarea>
+
+    
+    <script>
+       
+        var symptomList = ["itching", "skin rash", "nodal skin eruptions", "continuous sneezing", "shivering", "chills", "joint pain", "stomach pain", "acidity", "ulcers on tongue", "muscle wasting", "vomiting", "burning micturition", "spotting urination", "fatigue", "weight gain", "anxiety", "cold hands and feet", "mood swings", "weight loss", "restlessness", "lethargy", "patches in throat", "irregular sugar level", "cough", "high fever", "sunken eyes", "breathlessness", "sweating", "dehydration", "indigestion", "headache", "yellowish skin", "dark urine", "nausea", "loss of appetite", "pain behind the eyes", "back pain", "constipation", "abdominal pain", "diarrhoea", "mild fever", "yellow urine", "yellowing of eyes", "acute liver failure", "fluid overload", "swelling of stomach", "swelled lymph nodes", "malaise", "blurred and distorted vision", "phlegm", "throat irritation", "redness of eyes", "sinus pressure", "runny nose", "congestion", "chest pain", "weakness in limbs", "fast heart rate", "pain during bowel movements", "pain in anal region", "bloody stool", "irritation in anus", "neck pain", "dizziness", "cramps", "bruising", "obesity", "swollen legs", "swollen blood vessels", "puffy face and eyes", "enlarged thyroid", "brittle nails", "swollen extremities", "excessive hunger", "extra marital contacts", "drying and tingling lips", "slurred speech", "knee pain", "hip joint pain", "muscle weakness", "stiff neck", "swelling joints", "movement stiffness", "spinning movements", "loss of balance", "unsteadiness", "weakness of one body side", "loss of smell", "bladder discomfort", "foul smell of urine", "continuous feel of urine", "passage of gases", "internal itching", "toxic look (typhos)", "depression", "irritability", "muscle pain", "altered sensorium", "red spots over body", "belly pain", "abnormal menstruation", "dischromic patches", "watering from eyes", "increased appetite", "polyuria", "family history", "mucoid sputum", "rusty sputum", "lack of concentration", "visual disturbances", "receiving blood transfusion", "receiving unsterile injections", "coma", "stomach bleeding", "distention of abdomen", "history of alcohol consumption", "blood in sputum", "prominent veins on calf", "palpitations", "painful walking", "pus-filled pimples", "blackheads", "scurring", "skin peeling", "silver-like dusting", "small dents in nails", "inflammatory nails", "blister", "red sore around nose", "yellow crust ooze", "prognosis"];
+
+        var input = document.getElementById('symptomInput');
+        var awesomplete = new Awesomplete(input, {
+            list: symptomList,
+            filter: function(text, input) {
+                var words = input.split(/\s+/);
+                var lastWord = words[words.length - 1];
+                return Awesomplete.FILTER_CONTAINS(text, lastWord);
+            },
+            replace: function(suggestion) {
+                var words = input.value.split(/\s+/);
+                words[words.length - 1] = suggestion;
+                input.value = words.join(' ') + ' ';
+            }
+        });
+    </script>
+    <button onclick="extractKeywords()">Proceed</button>
+
+    <h2>Extracted Keywords:</h2>
+    <ul id="keywordList"></ul>
+
+    <script>
+        function extractKeywords() {
+            
+            var userInput = input.value.trim();
+
+           
+            var words = userInput.split(/\s+/);
+
+            
+            var extractedKeywords = [];
+            for (var i = 0; i < words.length; i++) {
+                for (var j = i + 1; j <= words.length; j++) {
+                    var wordSequence = words.slice(i, j).join(' ');
+                    if (symptomList.includes(wordSequence)) {
+                        extractedKeywords.push(wordSequence);
+                    }
+                }   
+            }
+            
+            displayKeywords(extractedKeywords);
+            sendKeywordsToBackend(extractedKeywords);
+            
+        }
+
+        function displayKeywords(keywords) {
+            var keywordList = document.getElementById('keywordList');
+            
+            
+            keywordList.innerHTML = '';
+
+            
+            keywords.forEach(function(keyword) {
+                var listItem = document.createElement('li');
+                listItem.textContent = keyword;
+                keywordList.appendChild(listItem);
+            });
+        }
+        function sendKeywordsToBackend(keywords) {
+            fetch('/process_keywords', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ keywords: keywords }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        setTimeout(function() {
+               
+                document.getElementById("loadingMessage").style.display = "none";
+
+                
+                document.getElementById("resultHeader").style.display = "block";
+                document.getElementById("result").style.display = "block";
+                document.getElementById("result").textContent = "processed result";
+
+                document.getElementById("pred2ValueHeader").style.display = "block";
+                document.getElementById("pred2Value").style.display = "block";
+                document.getElementById("pred2Value").textContent = "pred2 value";
+            }, 3000); 
+        
+    </script>
+    <h2>Result:</h2>
+    <p id="result">{{ result }}</p>
+
+</body>
+</html>
