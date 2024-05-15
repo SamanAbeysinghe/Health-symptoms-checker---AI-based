@@ -1,0 +1,64 @@
+<!-- results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #results {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: justify;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        strong {
+            font-weight: bold;
+        }
+        .details-paragraph p {
+            margin-bottom: 15px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 5; /* Adjust the number of lines you want to display */
+            -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Limit the number of words in the 'details' paragraph
+        var detailsParagraph = document.getElementById('details-paragraph');
+        var maxWords = 100; // Adjust the maximum number of words
+
+        if (detailsParagraph) {
+            var words = detailsParagraph.textContent.split(' ');
+            if (words.length > maxWords) {
+                detailsParagraph.textContent = words.slice(0, maxWords).join(' ') + '...';
+            }
+        }
+    </script>
+
+    <div id="results">
+        <h2>Search Results</h2>
+        <p><strong>Disease:</strong> {{ disease }}</p>
+        <div id="disease-details">
+            <!-- Display the details here -->
+            <p id="details-paragraph"><strong>Details:</strong> {{ details }}</p>
+        </div>
+    </div>
+
+</body>
+</html>
